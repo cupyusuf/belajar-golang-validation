@@ -83,7 +83,7 @@ func TestValidationErrors(t *testing.T) {
 	validate := validator.New()
 	loginRequest := LoginRequest{
 		Email:    "yusuf",
-		Password: "yusuf",
+		Password: "usuf",
 	}
 
 	err := validate.Struct(loginRequest)
@@ -93,5 +93,25 @@ func TestValidationErrors(t *testing.T) {
 		for _, fieldError := range validationErrors {
 			fmt.Println("error", fieldError.Field(), "on tag", fieldError.Tag(), "with error", fieldError.Error())
 		}
+	}
+}
+
+func TestStructCrossField(t *testing.T) {
+	type RegisterUser struct {
+		Email           string `validate:"required,email"`
+		Password        string `validate:"required,min=5"`
+		ConfirmPassword string `validate:"required,min=5,eqfield=Password"`
+	}
+
+	validate := validator.New()
+	request := RegisterUser{
+		Email:           "yusuf@gmail.com",
+		Password:        "yusuf10",
+		ConfirmPassword: "yusuf10",
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 }
